@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sube tu proyecto</title>
+</head>
+<body>
+  <h1>Sube tu proyecto</h1>
+
+  <form id="formProyecto">
+    <div>
+      <label>Título:</label><br />
+      <input type="text" name="titulo" required />
+    </div>
+
+    <div>
+      <label>Descripción:</label><br />
+      <textarea name="descripcion" required></textarea>
+    </div>
+
+    <div>
+      <label>Asignatura:</label><br />
+      <input type="text" name="asignatura" required />
+    </div>
+
+    <div>
+      <label>Autores (separados por comas):</label><br />
+      <input type="text" name="autores" required />
+    </div>
+
+    <div>
+      <label>Enlace externo (itch.io, web, etc.):</label><br />
+      <input type="url" name="enlaceExterno" />
+    </div>
+
+    <div>
+      <label>Curso (ej: 3º):</label><br />
+      <input type="text" name="curso" />
+    </div>
+
+    <button type="submit">Enviar proyecto</button>
+  </form>
+
+  <p id="mensaje"></p>
+
+  <script src="subir.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Archivos sensibles
+.env
+node_modules/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Repositorio de proyectos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Repositorio de proyectos</h1>
+
+  <div>
+    <label for="filtroAsignatura">Filtrar por asignatura:</label>
+    <input type="text" id="filtroAsignatura" placeholder="Proyecto 1, Proyecto 2, ..." />
+    <button id="btnFiltrar">Filtrar</button>
+    <button id="btnLimpiar">Limpiar filtros</button>
+  </div>
+
+    <div>
+        <label for="filtroCurso">Filtrar por curso:</label>
+        <input type="text" id="filtroCurso" placeholder="1º, 2º, 3º..." />
+        </div>
+
+        <div>
+        <label for="filtroTexto">Buscar en título/descripción:</label>
+        <input type="text" id="filtroTexto" placeholder="palabra clave..." />
+    </div>
+
+  <h2>Proyectos</h2>
+  <div id="listaProyectos"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
