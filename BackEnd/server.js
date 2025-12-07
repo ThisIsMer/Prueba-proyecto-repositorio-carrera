@@ -81,7 +81,6 @@ app.get('/proyectos/:id', async (req, res) => {
 // Enviar solicitud de nuevo proyecto
 app.post('/proyectos/solicitud', async (req, res) => {
   try {
-    console.log('Body que llega:', req.body);
     const {
       titulo,
       descripcion,
@@ -91,7 +90,14 @@ app.post('/proyectos/solicitud', async (req, res) => {
       imagenes,
       videos,
       curso,
+      anio,
+      licencia,
+      autorizacionLegal,
     } = req.body;
+
+    if (!autorizacionLegal) {
+      return res.status(400).json({ error: 'Debe aceptar la autorización legal' });
+    }
 
     const nuevoProyecto = new Proyecto({
       titulo,
@@ -102,7 +108,10 @@ app.post('/proyectos/solicitud', async (req, res) => {
       imagenes: imagenes || [],
       videos: videos || [],
       curso,
-      aprobado: false, // por defecto pendiente
+      anio,
+      licencia,
+      autorizacionLegal,
+      aprobado: false,
     });
 
     await nuevoProyecto.save();
@@ -132,5 +141,40 @@ app.post('/admin/proyectos/:id/aprobar', checkAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al aprobar el proyecto' });
+  }
+});
+
+// Actualizar un proyecto por id (solo datos, no aprobado)
+app.put('/proyectos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const update = req.body;
+    const proyecto = await Proyecto.findByIdAndUpdate(id, update, { new: true });
+
+    if (!proyecto) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' });
+    }
+
+    res.json({ mensaje: 'Proyecto actualizado', proyecto });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al actualizar el proyecto' });
+  }
+});
+
+// Borrar un proyecto por id
+app.delete('/proyectos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const proyecto = await Proyecto.findByIdAndDelete(id);
+
+    if (!proyecto) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' });
+    }
+
+    res.json({ mensaje: 'Proyecto eliminado' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al eliminar el proyecto' });
   }
 });

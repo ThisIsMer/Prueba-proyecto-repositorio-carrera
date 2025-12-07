@@ -38,11 +38,50 @@
       <input type="text" name="curso" />
     </div>
 
+    <div>
+  <label>Año de creación del trabajo:</label><br />
+  <input type="number" name="anio" min="2000" max="2100" />
+
+</div>
+
+<div>
+  <label>Licencia Creative Commons:</label><br />
+  <select name="licencia">
+    <option value="">Selecciona una licencia…</option>
+    <option value="CC BY">CC BY</option>
+    <option value="CC BY-SA">CC BY-SA</option>
+    <option value="CC BY-NC">CC BY-NC</option>
+    <option value="CC BY-NC-SA">CC BY-NC-SA</option>
+    <option value="CC0">CC0 (Dominio público)</option>
+  </select>
+</div>
+
+<div>
+  <label>
+    <input type="checkbox" name="autorizacionLegal" required />
+    Declaro que doy mi autorización para publicar este trabajo en el repositorio y acepto las condiciones de uso y tratamiento de datos.
+  </label>
+</div>
+
     <button type="submit">Enviar proyecto</button>
   </form>
 
   <p id="mensaje"></p>
 
   <script src="subir.js"></script>
+
+  <hr />
+
+<h2>Editar o eliminar proyecto existente</h2>
+
+<div>
+  <label>ID del proyecto:</label><br />
+  <input type="text" id="editId" placeholder="Copia aquí el ID del proyecto" />
+</div>
+
+<button type="button" id="btnCargarProyecto">Cargar datos</button>
+<button type="button" id="btnGuardarCambios">Guardar cambios</button>
+<button type="button" id="btnBorrarProyecto">Eliminar proyecto</button>
+
 </body>
 </html>

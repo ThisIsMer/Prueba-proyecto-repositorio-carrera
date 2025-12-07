@@ -15,6 +15,10 @@ form.addEventListener('submit', async (e) => {
   const autoresTexto = formData.get('autores').trim();
   const enlaceExterno = formData.get('enlaceExterno').trim();
   const curso = formData.get('curso').trim();
+  const anioTexto = formData.get('anio').trim();
+  const licencia = formData.get('licencia').trim();
+  const autorizacionLegal = formData.get('autorizacionLegal') === 'on';
+
 
   const autores = autoresTexto
     ? autoresTexto.split(',').map((a) => a.trim()).filter(Boolean)
@@ -29,6 +33,9 @@ form.addEventListener('submit', async (e) => {
     imagenes: [],
     videos: [],
     curso,
+    anio: anioTexto ? Number(anioTexto) : undefined,
+    licencia,
+    autorizacionLegal,
   };
 
   try {

@@ -6,27 +6,54 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Repositorio de proyectos</h1>
+  <header>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <img src="logo-usal.png" alt="Universidad de Salamanca" style="height:50px;" />
+      <div>
+        <h1>Repositorio de proyectos</h1>
+        <p>Grado en Desarrollo de APlicaciones 3D Interactivas y Videojuegos (USAL)</p>
+      </div>
+    </div>
+    <nav>
+    <a href="index.html">Inicio</a> |
+    <a href="subir.html">Sube tu proyecto</a> |
+    <a href="admin/admin.html">Panel de administración</a>
+  </nav>
+  <hr />
+  </header>
+  
+  <div class="layout">
+    <aside class="sidebar">
+      <!-- Aquí van los filtros -->
+      <div>
+        <label for="filtroAsignatura">Filtrar por asignatura:</label>
+        <input type="text" id="filtroAsignatura" placeholder="Proyecto 1, Proyecto 2, ..." />
+        <button id="btnFiltrar">Filtrar</button>
+        <button id="btnLimpiar">Limpiar filtros</button>
+      </div>
+      <div>
+          <label for="filtroCurso">Filtrar por curso:</label>
+          <input type="text" id="filtroCurso" placeholder="1º, 2º, 3º..." />
+          </div>
 
-  <div>
-    <label for="filtroAsignatura">Filtrar por asignatura:</label>
-    <input type="text" id="filtroAsignatura" placeholder="Proyecto 1, Proyecto 2, ..." />
-    <button id="btnFiltrar">Filtrar</button>
-    <button id="btnLimpiar">Limpiar filtros</button>
+          <div>
+          <label for="filtroTexto">Buscar en título/descripción:</label>
+          <input type="text" id="filtroTexto" placeholder="palabra clave..." />
+      </div>
+    </aside>
+
+    <main class="main">
+      <h2>Proyectos</h2>
+      <div id="listaProyectos"></div>
+    </main>
   </div>
 
-    <div>
-        <label for="filtroCurso">Filtrar por curso:</label>
-        <input type="text" id="filtroCurso" placeholder="1º, 2º, 3º..." />
-        </div>
-
-        <div>
-        <label for="filtroTexto">Buscar en título/descripción:</label>
-        <input type="text" id="filtroTexto" placeholder="palabra clave..." />
-    </div>
-
-  <h2>Proyectos</h2>
-  <div id="listaProyectos"></div>
+  <footer class="footer">
+    <h3>Política de privacidad y tratamiento de datos</h3>
+    <p>
+      Aquí podrás añadir el texto resumido de la política o un enlace al documento completo.
+    </p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
