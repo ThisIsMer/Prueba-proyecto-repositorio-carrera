@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
+
 
 const listaProyectos = document.getElementById('listaProyectos');
 const filtroAsignatura = document.getElementById('filtroAsignatura');

@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
+
 
 const passwordInput = document.getElementById('adminPassword');
 const btnCargar = document.getElementById('btnCargar');
