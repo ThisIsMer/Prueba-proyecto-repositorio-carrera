@@ -7,38 +7,58 @@
 </head>
 <body>
   <header>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <img src="logo-usal.png" alt="Universidad de Salamanca" style="height:50px;" />
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+      <!-- Si tienes el logo, pon el archivo en la misma carpeta y descomenta la línea de abajo -->
+      <!-- <img src="logo-usal.png" alt="Universidad de Salamanca" style="height:50px;" /> -->
       <div>
         <h1>Repositorio de proyectos</h1>
-        <p>Grado en Desarrollo de APlicaciones 3D Interactivas y Videojuegos (USAL)</p>
+        <p>Grado en Desarrollo de Aplicaciones 3D Interactivas y Videojuegos (USAL)</p>
       </div>
     </div>
+
     <nav>
-    <a href="index.html">Inicio</a> |
-    <a href="subir.html">Sube tu proyecto</a> |
-    <a href="admin/admin.html">Panel de administración</a>
-  </nav>
-  <hr />
+      <a href="index.html">Inicio</a>
+      <a href="subir.html">Sube tu proyecto</a>
+      <a href="admin/admin.html">Panel de administración</a>
+    </nav>
+
+    <hr />
   </header>
-  
+
   <div class="layout">
     <aside class="sidebar">
-      <!-- Aquí van los filtros -->
+      <h2>Filtros</h2>
+
       <div>
-        <label for="filtroAsignatura">Filtrar por asignatura:</label>
-        <input type="text" id="filtroAsignatura" placeholder="Proyecto 1, Proyecto 2, ..." />
+        <label for="filtroAsignatura">Filtrar por asignatura:</label><br />
+        <input
+          type="text"
+          id="filtroAsignatura"
+          placeholder="Proyecto 1, Proyecto 2, ..."
+        />
+      </div>
+
+      <div>
+        <label for="filtroCurso">Filtrar por curso:</label><br />
+        <input
+          type="text"
+          id="filtroCurso"
+          placeholder="1º, 2º, 3º..."
+        />
+      </div>
+
+      <div>
+        <label for="filtroTexto">Buscar en título/descripción:</label><br />
+        <input
+          type="text"
+          id="filtroTexto"
+          placeholder="palabra clave..."
+        />
+      </div>
+
+      <div style="margin-top:8px;">
         <button id="btnFiltrar">Filtrar</button>
         <button id="btnLimpiar">Limpiar filtros</button>
-      </div>
-      <div>
-          <label for="filtroCurso">Filtrar por curso:</label>
-          <input type="text" id="filtroCurso" placeholder="1º, 2º, 3º..." />
-          </div>
-
-          <div>
-          <label for="filtroTexto">Buscar en título/descripción:</label>
-          <input type="text" id="filtroTexto" placeholder="palabra clave..." />
       </div>
     </aside>
 
@@ -51,7 +71,10 @@
   <footer class="footer">
     <h3>Política de privacidad y tratamiento de datos</h3>
     <p>
-      Aquí podrás añadir el texto resumido de la política o un enlace al documento completo.
+      Aquí puedes incluir un resumen de la política de privacidad del repositorio
+      y un enlace al documento completo de la Universidad de Salamanca con la
+      información detallada sobre protección de datos y uso de los trabajos
+      publicados.
     </p>
   </footer>
 
