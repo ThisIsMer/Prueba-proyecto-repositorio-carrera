@@ -78,6 +78,24 @@ app.get('/proyectos/:id', async (req, res) => {
   }
 });
 
+// Buscar un proyecto por título exacto
+app.get('/proyectos/buscar-por-titulo/:titulo', async (req, res) => {
+  try {
+    const { titulo } = req.params;
+    const proyecto = await Proyecto.findOne({ titulo });
+
+    if (!proyecto) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' });
+    }
+
+    res.json(proyecto);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al buscar el proyecto' });
+  }
+});
+
+
 // Enviar solicitud de nuevo proyecto
 app.post('/proyectos/solicitud', async (req, res) => {
   try {
