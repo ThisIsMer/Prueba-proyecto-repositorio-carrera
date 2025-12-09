@@ -1,3 +1,5 @@
+// FrontEnd/subir.js
+
 const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
 
 const form = document.getElementById('formProyecto');
@@ -13,7 +15,7 @@ const btnBorrarProyecto = document.getElementById('btnBorrarProyecto');
 let proyectoEditandoId = null;
 
 // ---------------------
-// Enviar nuevo proyecto
+// Enviar NUEVA SOLICITUD DE ALTA
 // ---------------------
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -21,23 +23,25 @@ form.addEventListener('submit', async (e) => {
 
   const body = construirBodyDesdeFormulario();
   if (!body.autorizacionLegal) {
-    mensajeEl.textContent = 'Debes aceptar la autorización legal para enviar el proyecto.';
+    mensajeEl.textContent =
+      'Debes aceptar la autorización legal para enviar el proyecto.';
     return;
   }
 
   try {
-    const res = await fetch(`${API_BASE}/proyectos/solicitud`, {
+    const res = await fetch(`${API_BASE}/solicitudes/alta`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
 
     if (!res.ok) {
-      mensajeEl.textContent = 'Error al enviar el proyecto.';
+      mensajeEl.textContent = 'Error al enviar la solicitud de alta.';
       return;
     }
 
-    mensajeEl.textContent = 'Proyecto enviado. Quedará pendiente de aprobación.';
+    mensajeEl.textContent =
+      'Solicitud enviada. El proyecto se publicará cuando sea aprobado por el gestor.';
     form.reset();
     proyectoEditandoId = null;
   } catch (err) {
@@ -47,7 +51,7 @@ form.addEventListener('submit', async (e) => {
 });
 
 // ---------------------
-// Cargar proyecto por título
+// Cargar proyecto EXISTENTE por título (para edición/borrado)
 // ---------------------
 btnCargarProyecto.addEventListener('click', async () => {
   const tituloBuscado = editTituloInput.value.trim();
@@ -58,7 +62,9 @@ btnCargarProyecto.addEventListener('click', async () => {
 
   try {
     const res = await fetch(
-      `${API_BASE}/proyectos/buscar-por-titulo/${encodeURIComponent(tituloBuscado)}`
+      `${API_BASE}/proyectos/buscar-por-titulo/${encodeURIComponent(
+        tituloBuscado
+      )}`
     );
 
     if (!res.ok) {
@@ -80,7 +86,8 @@ btnCargarProyecto.addEventListener('click', async () => {
     form.elements['licencia'].value = p.licencia || '';
     form.elements['autorizacionLegal'].checked = !!p.autorizacionLegal;
 
-    mensajeEl.textContent = 'Proyecto cargado. Ahora puedes modificar y guardar cambios.';
+    mensajeEl.textContent =
+      'Proyecto cargado. Ahora puedes modificarlo y guardar cambios o solicitar su eliminación.';
   } catch (err) {
     console.error(err);
     alert('Error al cargar el proyecto');
@@ -88,7 +95,8 @@ btnCargarProyecto.addEventListener('click', async () => {
 });
 
 // ---------------------
-// Guardar cambios en proyecto cargado
+// Guardar CAMBIOS directamente en el proyecto cargado
+// (más adelante lo cambiaremos para que genere una solicitud de edición)
 // ---------------------
 btnGuardarCambios.addEventListener('click', async () => {
   if (!proyectoEditandoId) {
@@ -98,7 +106,8 @@ btnGuardarCambios.addEventListener('click', async () => {
 
   const body = construirBodyDesdeFormulario();
   if (!body.autorizacionLegal) {
-    mensajeEl.textContent = 'Debes aceptar la autorización legal para guardar cambios.';
+    mensajeEl.textContent =
+      'Debes aceptar la autorización legal para guardar cambios.';
     return;
   }
 
@@ -110,7 +119,7 @@ btnGuardarCambios.addEventListener('click', async () => {
     });
 
     if (!res.ok) {
-      mensajeEl.textContent = 'Error al guardar cambios.';
+      mensajeEl.textContent = 'Error al guardar cambios en el proyecto.';
       return;
     }
 
@@ -122,7 +131,8 @@ btnGuardarCambios.addEventListener('click', async () => {
 });
 
 // ---------------------
-// Eliminar proyecto cargado
+// ELIMINAR proyecto cargado directamente
+// (más adelante lo cambiaremos para que sea una solicitud de borrado)
 // ---------------------
 btnBorrarProyecto.addEventListener('click', async () => {
   if (!proyectoEditandoId) {
@@ -168,7 +178,10 @@ function construirBodyDesdeFormulario() {
   const autorizacionLegal = formData.get('autorizacionLegal') === 'on';
 
   const autores = autoresTexto
-    ? autoresTexto.split(',').map((a) => a.trim()).filter(Boolean)
+    ? autoresTexto
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean)
     : [];
 
   const body = {

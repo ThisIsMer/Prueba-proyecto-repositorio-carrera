@@ -1,89 +1,202 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Sube tu proyecto</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <h1>Sube tu proyecto</h1>
+// FrontEnd/subir.js
 
-  <form id="formProyecto">
-    <div>
-      <label>Título:</label><br />
-      <input type="text" name="titulo" required />
-    </div>
+const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
 
-    <div>
-      <label>Descripción:</label><br />
-      <textarea name="descripcion" required></textarea>
-    </div>
+const form = document.getElementById('formProyecto');
+const mensajeEl = document.getElementById('mensaje');
 
-    <div>
-      <label>Asignatura:</label><br />
-      <input type="text" name="asignatura" required />
-    </div>
+// Elementos para edición por título
+const editTituloInput = document.getElementById('editTitulo');
+const btnCargarProyecto = document.getElementById('btnCargarProyecto');
+const btnGuardarCambios = document.getElementById('btnGuardarCambios');
+const btnBorrarProyecto = document.getElementById('btnBorrarProyecto');
 
-    <div>
-      <label>Autores (separados por comas):</label><br />
-      <input type="text" name="autores" required />
-    </div>
+// Guardamos el _id real del proyecto cargado para poder actualizar/borrar
+let proyectoEditandoId = null;
 
-    <div>
-      <label>Enlace externo (itch.io, web, etc.):</label><br />
-      <input type="url" name="enlaceExterno" />
-    </div>
+// ---------------------
+// Enviar NUEVA SOLICITUD DE ALTA
+// ---------------------
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  mensajeEl.textContent = '';
 
-    <div>
-      <label>Curso (ej: 3º):</label><br />
-      <input type="text" name="curso" />
-    </div>
+  const body = construirBodyDesdeFormulario();
+  if (!body.autorizacionLegal) {
+    mensajeEl.textContent =
+      'Debes aceptar la autorización legal para enviar el proyecto.';
+    return;
+  }
 
-    <div>
-  <label>Año de creación del trabajo:</label><br />
-  <input type="number" name="anio" min="2000" max="2100" />
+  try {
+    const res = await fetch(`${API_BASE}/solicitudes/alta`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-</div>
+    if (!res.ok) {
+      mensajeEl.textContent = 'Error al enviar la solicitud de alta.';
+      return;
+    }
 
-<div>
-  <label>Licencia Creative Commons:</label><br />
-  <select name="licencia">
-    <option value="">Selecciona una licencia…</option>
-    <option value="CC BY">CC BY</option>
-    <option value="CC BY-SA">CC BY-SA</option>
-    <option value="CC BY-NC">CC BY-NC</option>
-    <option value="CC BY-NC-SA">CC BY-NC-SA</option>
-    <option value="CC0">CC0 (Dominio público)</option>
-  </select>
-</div>
+    mensajeEl.textContent =
+      'Solicitud enviada. El proyecto se publicará cuando sea aprobado por el gestor.';
+    form.reset();
+    proyectoEditandoId = null;
+  } catch (err) {
+    console.error(err);
+    mensajeEl.textContent = 'Error de conexión con el servidor.';
+  }
+});
 
-<div>
-  <label>
-    <input type="checkbox" name="autorizacionLegal" required />
-    Declaro que doy mi autorización para publicar este trabajo en el repositorio y acepto las condiciones de uso y tratamiento de datos.
-  </label>
-</div>
+// ---------------------
+// Cargar proyecto EXISTENTE por título (para edición/borrado)
+// ---------------------
+btnCargarProyecto.addEventListener('click', async () => {
+  const tituloBuscado = editTituloInput.value.trim();
+  if (!tituloBuscado) {
+    alert('Introduce el título del proyecto');
+    return;
+  }
 
-    <button type="submit">Enviar proyecto</button>
-  </form>
+  try {
+    const res = await fetch(
+      `${API_BASE}/proyectos/buscar-por-titulo/${encodeURIComponent(
+        tituloBuscado
+      )}`
+    );
 
-  <p id="mensaje"></p>
+    if (!res.ok) {
+      alert('Proyecto no encontrado');
+      return;
+    }
 
-  <script src="subir.js"></script>
+    const p = await res.json();
+    proyectoEditandoId = p._id;
 
-  <hr />
+    // Rellenar el formulario con los datos existentes
+    form.elements['titulo'].value = p.titulo || '';
+    form.elements['descripcion'].value = p.descripcion || '';
+    form.elements['asignatura'].value = p.asignatura || '';
+    form.elements['autores'].value = (p.autores || []).join(', ');
+    form.elements['enlaceExterno'].value = p.enlaceExterno || '';
+    form.elements['curso'].value = p.curso || '';
+    form.elements['anio'].value = p.anio || '';
+    form.elements['licencia'].value = p.licencia || '';
+    form.elements['autorizacionLegal'].checked = !!p.autorizacionLegal;
 
-<h2>Editar o eliminar proyecto existente</h2>
+    mensajeEl.textContent =
+      'Proyecto cargado. Ahora puedes modificarlo y guardar cambios o solicitar su eliminación.';
+  } catch (err) {
+    console.error(err);
+    alert('Error al cargar el proyecto');
+  }
+});
 
-<div>
-  <label>Título del proyecto:</label><br />
-  <input type="text" id="editTitulo" placeholder="Escribe el título exactamente" />
-</div>
+// ---------------------
+// Guardar CAMBIOS directamente en el proyecto cargado
+// (más adelante lo cambiaremos para que genere una solicitud de edición)
+// ---------------------
+btnGuardarCambios.addEventListener('click', async () => {
+  if (!proyectoEditandoId) {
+    alert('Primero carga un proyecto por título');
+    return;
+  }
 
-<button type="button" id="btnCargarProyecto">Cargar datos</button>
-<button type="button" id="btnGuardarCambios">Guardar cambios</button>
-<button type="button" id="btnBorrarProyecto">Eliminar proyecto</button>
+  const body = construirBodyDesdeFormulario();
+  if (!body.autorizacionLegal) {
+    mensajeEl.textContent =
+      'Debes aceptar la autorización legal para guardar cambios.';
+    return;
+  }
 
+  try {
+    const res = await fetch(`${API_BASE}/proyectos/${proyectoEditandoId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-</body>
-</html>
+    if (!res.ok) {
+      mensajeEl.textContent = 'Error al guardar cambios en el proyecto.';
+      return;
+    }
+
+    mensajeEl.textContent = 'Proyecto actualizado correctamente.';
+  } catch (err) {
+    console.error(err);
+    mensajeEl.textContent = 'Error de conexión al actualizar.';
+  }
+});
+
+// ---------------------
+// ELIMINAR proyecto cargado directamente
+// (más adelante lo cambiaremos para que sea una solicitud de borrado)
+// ---------------------
+btnBorrarProyecto.addEventListener('click', async () => {
+  if (!proyectoEditandoId) {
+    alert('Primero carga un proyecto por título');
+    return;
+  }
+
+  if (!confirm('¿Seguro que quieres eliminar este proyecto?')) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/proyectos/${proyectoEditandoId}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      mensajeEl.textContent = 'Error al eliminar el proyecto.';
+      return;
+    }
+
+    mensajeEl.textContent = 'Proyecto eliminado.';
+    form.reset();
+    proyectoEditandoId = null;
+  } catch (err) {
+    console.error(err);
+    mensajeEl.textContent = 'Error de conexión al eliminar.';
+  }
+});
+
+// ---------------------
+// Función común: leer el formulario
+// ---------------------
+function construirBodyDesdeFormulario() {
+  const formData = new FormData(form);
+
+  const titulo = formData.get('titulo').trim();
+  const descripcion = formData.get('descripcion').trim();
+  const asignatura = formData.get('asignatura').trim();
+  const autoresTexto = formData.get('autores').trim();
+  const enlaceExterno = formData.get('enlaceExterno').trim();
+  const curso = formData.get('curso').trim();
+  const anioTexto = formData.get('anio').trim();
+  const licencia = formData.get('licencia').trim();
+  const autorizacionLegal = formData.get('autorizacionLegal') === 'on';
+
+  const autores = autoresTexto
+    ? autoresTexto
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean)
+    : [];
+
+  const body = {
+    titulo,
+    descripcion,
+    asignatura,
+    autores,
+    enlaceExterno,
+    imagenes: [],
+    videos: [],
+    curso,
+    anio: anioTexto ? Number(anioTexto) : undefined,
+    licencia,
+    autorizacionLegal,
+  };
+
+  return body;
+}
