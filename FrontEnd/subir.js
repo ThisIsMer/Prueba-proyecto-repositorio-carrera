@@ -1,6 +1,7 @@
 // FrontEnd/subir.js
 
 const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
+const CLOUDINARY_CLOUD_NAME = 'dzl5pmsgc'; // ← CAMBIA AQUÍ por tu Cloud Name de Cloudinary
 
 const form = document.getElementById('formProyecto');
 const mensajeEl = document.getElementById('mensaje');
@@ -32,13 +33,47 @@ const mensajeBorrar = document.getElementById('mensajeBorrar');
 // Variables de estado
 let proyectoEditandoId = null;
 let proyectoBorrandoId = null;
+let archivosSubidos = { imagenes: [], videos: [] }; // Almacena URLs de Cloudinary
+
+// ===== SUBIR ARCHIVOS A CLOUDINARY =====
+async function subirArchivosACloudinary(files, tipo) {
+  const urls = [];
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'unsigned_preset'); // Sube sin autenticación (requiere config en Cloudinary)
+
+    try {
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${tipo === 'imagenes' ? 'image' : 'video'}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      if (!res.ok) {
+        console.error(`Error subiendo ${file.name}:`, res.statusText);
+        continue;
+      }
+
+      const data = await res.json();
+      urls.push(data.secure_url); // URL pública del archivo
+    } catch (err) {
+      console.error(`Error con Cloudinary para ${file.name}:`, err);
+    }
+  }
+
+  return urls;
+}
 
 // ===== ENVÍO DE NUEVA SOLICITUD DE ALTA =====
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  mensajeEl.textContent = '';
+  mensajeEl.textContent = 'Subiendo archivos...';
 
-  const body = construirBodyDesdeFormulario();
+  const body = await construirBodyDesdeFormulario();
   if (!body.autorizacionLegal) {
     mensajeEl.textContent =
       'Debes aceptar la autorización legal para enviar el proyecto.';
@@ -60,6 +95,7 @@ form.addEventListener('submit', async (e) => {
     mensajeEl.textContent =
       'Solicitud enviada. El proyecto se publicará cuando sea aprobado por el gestor.';
     form.reset();
+    archivosSubidos = { imagenes: [], videos: [] };
     proyectoEditandoId = null;
   } catch (err) {
     console.error(err);
@@ -140,7 +176,9 @@ btnGuardarCambios.addEventListener('click', async () => {
     return;
   }
 
-  const body = construirBodyDesdeFormularioEditar();
+  mensajeGuardar.textContent = 'Subiendo archivos...';
+
+  const body = await construirBodyDesdeFormularioEditar();
   if (!body.autorizacionLegal) {
     mensajeGuardar.textContent =
       'Debes aceptar la autorización legal para guardar cambios.';
@@ -246,7 +284,7 @@ btnConfirmarBorrado.addEventListener('click', async () => {
 });
 
 // ===== FUNCIONES AUXILIARES =====
-function construirBodyDesdeFormulario() {
+async function construirBodyDesdeFormulario() {
   const formData = new FormData(form);
 
   const titulo = formData.get('titulo').trim();
@@ -266,14 +304,29 @@ function construirBodyDesdeFormulario() {
         .filter(Boolean)
     : [];
 
+  // Procesar imágenes y videos
+  const imagenes = formData.getAll('imagenes');
+  const videos = formData.getAll('videos');
+
+  let urlsImagenes = [];
+  let urlsVideos = [];
+
+  if (imagenes.length > 0) {
+    urlsImagenes = await subirArchivosACloudinary(imagenes, 'imagenes');
+  }
+
+  if (videos.length > 0) {
+    urlsVideos = await subirArchivosACloudinary(videos, 'videos');
+  }
+
   return {
     titulo,
     descripcion,
     asignatura,
     autores,
     enlaceExterno,
-    imagenes: [],
-    videos: [],
+    imagenes: urlsImagenes,
+    videos: urlsVideos,
     curso,
     anio: anioTexto ? Number(anioTexto) : undefined,
     licencia,
@@ -281,7 +334,7 @@ function construirBodyDesdeFormulario() {
   };
 }
 
-function construirBodyDesdeFormularioEditar() {
+async function construirBodyDesdeFormularioEditar() {
   const titulo = document.getElementById('editTitulo').value.trim();
   const descripcion = document.getElementById('editDescripcion').value.trim();
   const asignatura = document.getElementById('editAsignatura').value.trim();
@@ -299,14 +352,29 @@ function construirBodyDesdeFormularioEditar() {
         .filter(Boolean)
     : [];
 
+  // Procesar imágenes y videos si hay nuevas
+  const imagenes = document.getElementById('imagenes').files;
+  const videos = document.getElementById('videos').files;
+
+  let urlsImagenes = archivosSubidos.imagenes;
+  let urlsVideos = archivosSubidos.videos;
+
+  if (imagenes.length > 0) {
+    urlsImagenes = await subirArchivosACloudinary(Array.from(imagenes), 'imagenes');
+  }
+
+  if (videos.length > 0) {
+    urlsVideos = await subirArchivosACloudinary(Array.from(videos), 'videos');
+  }
+
   return {
     titulo,
     descripcion,
     asignatura,
     autores,
     enlaceExterno,
-    imagenes: [],
-    videos: [],
+    imagenes: urlsImagenes,
+    videos: urlsVideos,
     curso,
     anio: anioTexto ? Number(anioTexto) : undefined,
     licencia,
