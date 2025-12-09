@@ -255,3 +255,47 @@ input[type="file"] + small {
 #tarjetaProyectoBorrar .card h3 {
   color: #856404;
 }
+/* ===== Botones del panel admin ===== */
+.btn-aprobar {
+  background-color: #28a745;
+  border: 1px solid #28a745;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn-aprobar:hover {
+  background-color: #218838;
+  border-color: #218838;
+}
+
+.btn-rechazar {
+  background-color: #dc3545;
+  border: 1px solid #dc3545;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.btn-rechazar:hover {
+  background-color: #c82333;
+  border-color: #c82333;
+}
+
+/* ===== Mensaje de solicitud ===== */
+.mensaje-solicitud {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.mensaje-solicitud.exito {
+  color: #155724;
+}
+
+.mensaje-solicitud.error {
+  color: #dc3545;
+}

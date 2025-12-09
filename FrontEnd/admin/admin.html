@@ -2,20 +2,41 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Panel admin - Repositorio</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Panel de administración</title>
+  <link rel="stylesheet" href="../styles.css" />
 </head>
 <body>
-  <h1>Panel de administración</h1>
+  <header>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+      <div>
+        <h1>Repositorio de proyectos</h1>
+        <p>Grado en Desarrollo de Aplicaciones 3D Interactivas y Videojuegos (USAL)</p>
+      </div>
+    </div>
 
-  <div>
-    <label for="adminPassword">Contraseña de admin:</label>
-    <input type="password" id="adminPassword" />
-    <button id="btnCargar">Ver proyectos pendientes</button>
-  </div>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../subir.html">Sube tu proyecto</a>
+      <a href="admin.html">Panel de administración</a>
+    </nav>
 
-  <h2>Proyectos pendientes</h2>
-  <div id="listaPendientes"></div>
+    <hr />
+  </header>
+
+  <main class="main">
+    <h1>Panel de administración</h1>
+    <p>Aquí puedes revisar las solicitudes de proyectos pendientes de aprobación.</p>
+
+    <div id="solicitudesContainer"></div>
+  </main>
+
+  <footer class="footer">
+    <h3>Política de privacidad y tratamiento de datos</h3>
+    <p>
+      Aquí puedes incluir un resumen de la política de privacidad del repositorio y un enlace al
+      documento completo.
+    </p>
+  </footer>
 
   <script src="admin.js"></script>
 </body>
