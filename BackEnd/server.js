@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Proyecto = require('./models/Proyecto');
+const Solicitud = require('./models/Solicitud');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -139,6 +140,35 @@ app.post('/proyectos/solicitud', async (req, res) => {
     res.status(500).json({ error: 'Error al crear la solicitud' });
   }
 });
+
+// Crear una solicitud de ALTA de proyecto (desde la página de "Sube tu proyecto")
+app.post('/solicitudes/alta', async (req, res) => {
+  try {
+    const datos = req.body;
+
+    // Comprobación mínima de autorización legal
+    if (!datos.autorizacionLegal) {
+      return res
+        .status(400)
+        .json({ error: 'Debe aceptar la autorización legal para enviar el proyecto' });
+    }
+
+    const solicitud = new Solicitud({
+      tipo: 'alta',
+      datosPropuesto: datos,
+    });
+
+    await solicitud.save();
+
+    res
+      .status(201)
+      .json({ mensaje: 'Solicitud de alta enviada. Queda pendiente de revisión.', solicitud });
+  } catch (err) {
+    console.error('Error al crear la solicitud de alta:', err);
+    res.status(500).json({ error: 'Error al crear la solicitud de alta' });
+  }
+});
+
 
 // Aprobar un proyecto por id (solo admin)
 app.post('/admin/proyectos/:id/aprobar', checkAdmin, async (req, res) => {
