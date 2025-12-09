@@ -5,18 +5,35 @@ const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
 const form = document.getElementById('formProyecto');
 const mensajeEl = document.getElementById('mensaje');
 
-// Elementos para edición por título
-const editTituloInput = document.getElementById('editTitulo');
-const btnCargarProyecto = document.getElementById('btnCargarProyecto');
+// Botones de toggle para editar/borrar
+const btnToggleEditar = document.getElementById('btnToggleEditar');
+const btnToggleBorrar = document.getElementById('btnToggleBorrar');
+
+// Secciones de edición y borrado
+const seccionEditar = document.getElementById('seccionEditar');
+const seccionBorrar = document.getElementById('seccionBorrar');
+
+// Elementos de EDICIÓN
+const editTituloSearch = document.getElementById('editTituloSearch');
+const btnCargarProyectoEditar = document.getElementById('btnCargarProyectoEditar');
+const mensajeEditar = document.getElementById('mensajeEditar');
+const formProyectoEditar = document.getElementById('formProyectoEditar');
 const btnGuardarCambios = document.getElementById('btnGuardarCambios');
-const btnBorrarProyecto = document.getElementById('btnBorrarProyecto');
+const mensajeGuardar = document.getElementById('mensajeGuardar');
 
-// Guardamos el _id real del proyecto cargado para poder actualizar/borrar
+// Elementos de BORRADO
+const borrarTituloSearch = document.getElementById('borrarTituloSearch');
+const btnCargarProyectoBorrar = document.getElementById('btnCargarProyectoBorrar');
+const mensajeBorrarBusqueda = document.getElementById('mensajeBorrarBusqueda');
+const tarjetaProyectoBorrar = document.getElementById('tarjetaProyectoBorrar');
+const btnConfirmarBorrado = document.getElementById('btnConfirmarBorrado');
+const mensajeBorrar = document.getElementById('mensajeBorrar');
+
+// Variables de estado
 let proyectoEditandoId = null;
+let proyectoBorrandoId = null;
 
-// ---------------------
-// Enviar NUEVA SOLICITUD DE ALTA
-// ---------------------
+// ===== ENVÍO DE NUEVA SOLICITUD DE ALTA =====
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   mensajeEl.textContent = '';
@@ -50,13 +67,30 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// ---------------------
-// Cargar proyecto EXISTENTE por título (para edición/borrado)
-// ---------------------
-btnCargarProyecto.addEventListener('click', async () => {
-  const tituloBuscado = editTituloInput.value.trim();
+// ===== TOGGLE SECCIONES DE EDICIÓN/BORRADO =====
+btnToggleEditar.addEventListener('click', () => {
+  seccionEditar.style.display =
+    seccionEditar.style.display === 'none' ? 'block' : 'none';
+  seccionBorrar.style.display = 'none';
+  formProyectoEditar.style.display = 'none';
+  mensajeEditar.textContent = '';
+});
+
+btnToggleBorrar.addEventListener('click', () => {
+  seccionBorrar.style.display =
+    seccionBorrar.style.display === 'none' ? 'block' : 'none';
+  seccionEditar.style.display = 'none';
+  formProyectoEditar.style.display = 'none';
+  tarjetaProyectoBorrar.style.display = 'none';
+  mensajeBorrarBusqueda.textContent = '';
+});
+
+// ===== BUSCAR PROYECTO PARA EDITAR =====
+btnCargarProyectoEditar.addEventListener('click', async () => {
+  const tituloBuscado = editTituloSearch.value.trim();
   if (!tituloBuscado) {
-    alert('Introduce el título del proyecto');
+    mensajeEditar.textContent = 'Introduce el título del proyecto';
+    mensajeEditar.style.color = '#dc3545';
     return;
   }
 
@@ -68,46 +102,49 @@ btnCargarProyecto.addEventListener('click', async () => {
     );
 
     if (!res.ok) {
-      alert('Proyecto no encontrado');
+      mensajeEditar.textContent = 'Proyecto no encontrado';
+      mensajeEditar.style.color = '#dc3545';
       return;
     }
 
     const p = await res.json();
     proyectoEditandoId = p._id;
 
-    // Rellenar el formulario con los datos existentes
-    form.elements['titulo'].value = p.titulo || '';
-    form.elements['descripcion'].value = p.descripcion || '';
-    form.elements['asignatura'].value = p.asignatura || '';
-    form.elements['autores'].value = (p.autores || []).join(', ');
-    form.elements['enlaceExterno'].value = p.enlaceExterno || '';
-    form.elements['curso'].value = p.curso || '';
-    form.elements['anio'].value = p.anio || '';
-    form.elements['licencia'].value = p.licencia || '';
-    form.elements['autorizacionLegal'].checked = !!p.autorizacionLegal;
+    // Rellenar formulario de edición
+    document.getElementById('editTitulo').value = p.titulo || '';
+    document.getElementById('editDescripcion').value = p.descripcion || '';
+    document.getElementById('editAsignatura').value = p.asignatura || '';
+    document.getElementById('editAutores').value = (p.autores || []).join(', ');
+    document.getElementById('editEnlaceExterno').value = p.enlaceExterno || '';
+    document.getElementById('editCurso').value = p.curso || '';
+    document.getElementById('editAnio').value = p.anio || '';
+    document.getElementById('editLicencia').value = p.licencia || '';
+    document.querySelector('input[name="autorizacionLegal"]').checked =
+      !!p.autorizacionLegal;
 
-    mensajeEl.textContent =
-      'Proyecto cargado. Ahora puedes modificarlo y guardar cambios o solicitar su eliminación.';
+    formProyectoEditar.style.display = 'block';
+    mensajeEditar.textContent = 'Proyecto cargado. Modifica los datos que desees.';
+    mensajeEditar.style.color = '#155724';
   } catch (err) {
     console.error(err);
-    alert('Error al cargar el proyecto');
+    mensajeEditar.textContent = 'Error al cargar el proyecto';
+    mensajeEditar.style.color = '#dc3545';
   }
 });
 
-// ---------------------
-// Guardar CAMBIOS directamente en el proyecto cargado
-// (más adelante lo cambiaremos para que genere una solicitud de edición)
-// ---------------------
+// ===== GUARDAR CAMBIOS DE EDICIÓN =====
 btnGuardarCambios.addEventListener('click', async () => {
   if (!proyectoEditandoId) {
-    alert('Primero carga un proyecto por título');
+    mensajeGuardar.textContent = 'Primero carga un proyecto';
+    mensajeGuardar.style.color = '#dc3545';
     return;
   }
 
-  const body = construirBodyDesdeFormulario();
+  const body = construirBodyDesdeFormularioEditar();
   if (!body.autorizacionLegal) {
-    mensajeEl.textContent =
+    mensajeGuardar.textContent =
       'Debes aceptar la autorización legal para guardar cambios.';
+    mensajeGuardar.style.color = '#dc3545';
     return;
   }
 
@@ -119,51 +156,96 @@ btnGuardarCambios.addEventListener('click', async () => {
     });
 
     if (!res.ok) {
-      mensajeEl.textContent = 'Error al guardar cambios en el proyecto.';
+      mensajeGuardar.textContent = 'Error al guardar cambios.';
+      mensajeGuardar.style.color = '#dc3545';
       return;
     }
 
-    mensajeEl.textContent = 'Proyecto actualizado correctamente.';
+    mensajeGuardar.textContent = 'Proyecto actualizado correctamente.';
+    mensajeGuardar.style.color = '#155724';
   } catch (err) {
     console.error(err);
-    mensajeEl.textContent = 'Error de conexión al actualizar.';
+    mensajeGuardar.textContent = 'Error de conexión.';
+    mensajeGuardar.style.color = '#dc3545';
   }
 });
 
-// ---------------------
-// ELIMINAR proyecto cargado directamente
-// (más adelante lo cambiaremos para que sea una solicitud de borrado)
-// ---------------------
-btnBorrarProyecto.addEventListener('click', async () => {
-  if (!proyectoEditandoId) {
-    alert('Primero carga un proyecto por título');
+// ===== BUSCAR PROYECTO PARA BORRAR =====
+btnCargarProyectoBorrar.addEventListener('click', async () => {
+  const tituloBuscado = borrarTituloSearch.value.trim();
+  if (!tituloBuscado) {
+    mensajeBorrarBusqueda.textContent = 'Introduce el título del proyecto';
+    mensajeBorrarBusqueda.style.color = '#dc3545';
     return;
   }
 
-  if (!confirm('¿Seguro que quieres eliminar este proyecto?')) return;
+  try {
+    const res = await fetch(
+      `${API_BASE}/proyectos/buscar-por-titulo/${encodeURIComponent(
+        tituloBuscado
+      )}`
+    );
+
+    if (!res.ok) {
+      mensajeBorrarBusqueda.textContent = 'Proyecto no encontrado';
+      mensajeBorrarBusqueda.style.color = '#dc3545';
+      tarjetaProyectoBorrar.style.display = 'none';
+      return;
+    }
+
+    const p = await res.json();
+    proyectoBorrandoId = p._id;
+
+    // Mostrar tarjeta del proyecto
+    document.getElementById('borrarTituloProyecto').textContent = p.titulo;
+    document.getElementById('borrarAsignatura').textContent = p.asignatura;
+    document.getElementById('borrarAutores').textContent = (p.autores || []).join(', ');
+    document.getElementById('borrarDescripcion').textContent = p.descripcion;
+
+    tarjetaProyectoBorrar.style.display = 'block';
+    mensajeBorrarBusqueda.textContent = 'Proyecto encontrado. Revísalo y confirma si deseas borrarlo.';
+    mensajeBorrarBusqueda.style.color = '#155724';
+  } catch (err) {
+    console.error(err);
+    mensajeBorrarBusqueda.textContent = 'Error al cargar el proyecto';
+    mensajeBorrarBusqueda.style.color = '#dc3545';
+  }
+});
+
+// ===== CONFIRMAR BORRADO =====
+btnConfirmarBorrado.addEventListener('click', async () => {
+  if (!proyectoBorrandoId) {
+    mensajeBorrar.textContent = 'Error: no hay proyecto seleccionado';
+    mensajeBorrar.style.color = '#dc3545';
+    return;
+  }
+
+  if (!confirm('¿Estás seguro? Esta acción no se puede deshacer.')) return;
 
   try {
-    const res = await fetch(`${API_BASE}/proyectos/${proyectoEditandoId}`, {
+    const res = await fetch(`${API_BASE}/proyectos/${proyectoBorrandoId}`, {
       method: 'DELETE',
     });
 
     if (!res.ok) {
-      mensajeEl.textContent = 'Error al eliminar el proyecto.';
+      mensajeBorrar.textContent = 'Error al eliminar el proyecto.';
+      mensajeBorrar.style.color = '#dc3545';
       return;
     }
 
-    mensajeEl.textContent = 'Proyecto eliminado.';
-    form.reset();
-    proyectoEditandoId = null;
+    mensajeBorrar.textContent = 'Solicitud de borrado enviada. Se eliminará cuando sea procesada.';
+    mensajeBorrar.style.color = '#155724';
+    tarjetaProyectoBorrar.style.display = 'none';
+    borrarTituloSearch.value = '';
+    proyectoBorrandoId = null;
   } catch (err) {
     console.error(err);
-    mensajeEl.textContent = 'Error de conexión al eliminar.';
+    mensajeBorrar.textContent = 'Error de conexión.';
+    mensajeBorrar.style.color = '#dc3545';
   }
 });
 
-// ---------------------
-// Función común: leer el formulario
-// ---------------------
+// ===== FUNCIONES AUXILIARES =====
 function construirBodyDesdeFormulario() {
   const formData = new FormData(form);
 
@@ -184,7 +266,7 @@ function construirBodyDesdeFormulario() {
         .filter(Boolean)
     : [];
 
-  const body = {
+  return {
     titulo,
     descripcion,
     asignatura,
@@ -197,6 +279,37 @@ function construirBodyDesdeFormulario() {
     licencia,
     autorizacionLegal,
   };
+}
 
-  return body;
+function construirBodyDesdeFormularioEditar() {
+  const titulo = document.getElementById('editTitulo').value.trim();
+  const descripcion = document.getElementById('editDescripcion').value.trim();
+  const asignatura = document.getElementById('editAsignatura').value.trim();
+  const autoresTexto = document.getElementById('editAutores').value.trim();
+  const enlaceExterno = document.getElementById('editEnlaceExterno').value.trim();
+  const curso = document.getElementById('editCurso').value.trim();
+  const anioTexto = document.getElementById('editAnio').value.trim();
+  const licencia = document.getElementById('editLicencia').value.trim();
+  const autorizacionLegal = document.querySelector('input[name="autorizacionLegal"]').checked;
+
+  const autores = autoresTexto
+    ? autoresTexto
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean)
+    : [];
+
+  return {
+    titulo,
+    descripcion,
+    asignatura,
+    autores,
+    enlaceExterno,
+    imagenes: [],
+    videos: [],
+    curso,
+    anio: anioTexto ? Number(anioTexto) : undefined,
+    licencia,
+    autorizacionLegal,
+  };
 }

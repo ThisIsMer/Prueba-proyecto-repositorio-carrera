@@ -199,3 +199,59 @@ a.enlace-accion:hover {
     width: 100%;
   }
 }
+
+/* ===== Botones secundarios ===== */
+.btn-secundario {
+  background-color: #6c757d;
+  border: 1px solid #6c757d;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-secundario:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+/* ===== Textarea (para descripción) ===== */
+textarea {
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ===== Mensajes de error/éxito ===== */
+.mensaje-error {
+  color: #dc3545;
+}
+
+.mensaje-exito {
+  color: #155724;
+}
+
+/* ===== Inputs de archivo ===== */
+input[type="file"] {
+  margin-bottom: 4px;
+}
+
+input[type="file"] + small {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* ===== Tarjeta de proyecto a borrar ===== */
+#tarjetaProyectoBorrar .card {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+
+#tarjetaProyectoBorrar .card h3 {
+  color: #856404;
+}

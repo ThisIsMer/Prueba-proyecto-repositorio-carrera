@@ -1,202 +1,236 @@
-// FrontEnd/subir.js
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sube tu proyecto</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+      <div>
+        <h1>Repositorio de proyectos</h1>
+        <p>Grado en Desarrollo de Aplicaciones 3D Interactivas y Videojuegos (USAL)</p>
+      </div>
+    </div>
 
-const API_BASE = 'https://prueba-proyecto-repositorio-carrera.onrender.com';
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="subir.html">Sube tu proyecto</a>
+      <a href="admin/admin.html">Panel de administración</a>
+    </nav>
 
-const form = document.getElementById('formProyecto');
-const mensajeEl = document.getElementById('mensaje');
+    <hr />
+  </header>
 
-// Elementos para edición por título
-const editTituloInput = document.getElementById('editTitulo');
-const btnCargarProyecto = document.getElementById('btnCargarProyecto');
-const btnGuardarCambios = document.getElementById('btnGuardarCambios');
-const btnBorrarProyecto = document.getElementById('btnBorrarProyecto');
+  <main class="main">
+    <h1>Sube tu proyecto al repositorio</h1>
 
-// Guardamos el _id real del proyecto cargado para poder actualizar/borrar
-let proyectoEditandoId = null;
+    <div class="card">
+      <h2>Pasos para subir tu proyecto</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </p>
+    </div>
 
-// ---------------------
-// Enviar NUEVA SOLICITUD DE ALTA
-// ---------------------
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  mensajeEl.textContent = '';
+    <!-- Formulario de subida de proyecto nuevo -->
+    <div class="card">
+      <h2>Envía tu proyecto</h2>
 
-  const body = construirBodyDesdeFormulario();
-  if (!body.autorizacionLegal) {
-    mensajeEl.textContent =
-      'Debes aceptar la autorización legal para enviar el proyecto.';
-    return;
-  }
+      <form id="formProyecto">
+        <div>
+          <label for="titulo">Título:</label><br />
+          <input type="text" id="titulo" name="titulo" required />
+        </div>
 
-  try {
-    const res = await fetch(`${API_BASE}/solicitudes/alta`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+        <div>
+          <label for="descripcion">Descripción:</label><br />
+          <textarea id="descripcion" name="descripcion" required></textarea>
+        </div>
 
-    if (!res.ok) {
-      mensajeEl.textContent = 'Error al enviar la solicitud de alta.';
-      return;
-    }
+        <div>
+          <label for="asignatura">Asignatura:</label><br />
+          <input type="text" id="asignatura" name="asignatura" required />
+        </div>
 
-    mensajeEl.textContent =
-      'Solicitud enviada. El proyecto se publicará cuando sea aprobado por el gestor.';
-    form.reset();
-    proyectoEditandoId = null;
-  } catch (err) {
-    console.error(err);
-    mensajeEl.textContent = 'Error de conexión con el servidor.';
-  }
-});
+        <div>
+          <label for="autores">Autores (separados por comas):</label><br />
+          <input type="text" id="autores" name="autores" required />
+        </div>
 
-// ---------------------
-// Cargar proyecto EXISTENTE por título (para edición/borrado)
-// ---------------------
-btnCargarProyecto.addEventListener('click', async () => {
-  const tituloBuscado = editTituloInput.value.trim();
-  if (!tituloBuscado) {
-    alert('Introduce el título del proyecto');
-    return;
-  }
+        <div>
+          <label for="enlaceExterno">Enlace externo (itch.io, web, etc.):</label><br />
+          <input type="text" id="enlaceExterno" name="enlaceExterno" />
+        </div>
 
-  try {
-    const res = await fetch(
-      `${API_BASE}/proyectos/buscar-por-titulo/${encodeURIComponent(
-        tituloBuscado
-      )}`
-    );
+        <div>
+          <label for="curso">Curso (ej: 3º):</label><br />
+          <input type="text" id="curso" name="curso" />
+        </div>
 
-    if (!res.ok) {
-      alert('Proyecto no encontrado');
-      return;
-    }
+        <div>
+          <label for="anio">Año de creación del trabajo:</label><br />
+          <input type="number" id="anio" name="anio" min="2000" max="2100" />
+        </div>
 
-    const p = await res.json();
-    proyectoEditandoId = p._id;
+        <div>
+          <label for="licencia">Licencia Creative Commons:</label><br />
+          <select id="licencia" name="licencia">
+            <option value="">Selecciona una licencia…</option>
+            <option value="CC BY">CC BY</option>
+            <option value="CC BY-SA">CC BY-SA</option>
+            <option value="CC BY-NC">CC BY-NC</option>
+            <option value="CC BY-NC-SA">CC BY-NC-SA</option>
+            <option value="CC0">CC0 (Dominio público)</option>
+          </select>
+        </div>
 
-    // Rellenar el formulario con los datos existentes
-    form.elements['titulo'].value = p.titulo || '';
-    form.elements['descripcion'].value = p.descripcion || '';
-    form.elements['asignatura'].value = p.asignatura || '';
-    form.elements['autores'].value = (p.autores || []).join(', ');
-    form.elements['enlaceExterno'].value = p.enlaceExterno || '';
-    form.elements['curso'].value = p.curso || '';
-    form.elements['anio'].value = p.anio || '';
-    form.elements['licencia'].value = p.licencia || '';
-    form.elements['autorizacionLegal'].checked = !!p.autorizacionLegal;
+        <div>
+          <label for="imagenes">Imágenes (sube archivos de imagen):</label><br />
+          <input type="file" id="imagenes" name="imagenes" multiple accept="image/*" />
+          <small>Puedes seleccionar varias imágenes a la vez</small>
+        </div>
 
-    mensajeEl.textContent =
-      'Proyecto cargado. Ahora puedes modificarlo y guardar cambios o solicitar su eliminación.';
-  } catch (err) {
-    console.error(err);
-    alert('Error al cargar el proyecto');
-  }
-});
+        <div>
+          <label for="videos">Videos (sube archivos de video):</label><br />
+          <input type="file" id="videos" name="videos" multiple accept="video/*" />
+          <small>Puedes seleccionar varios videos a la vez</small>
+        </div>
 
-// ---------------------
-// Guardar CAMBIOS directamente en el proyecto cargado
-// (más adelante lo cambiaremos para que genere una solicitud de edición)
-// ---------------------
-btnGuardarCambios.addEventListener('click', async () => {
-  if (!proyectoEditandoId) {
-    alert('Primero carga un proyecto por título');
-    return;
-  }
+        <div>
+          <label>
+            <input type="checkbox" name="autorizacionLegal" required />
+            Declaro que doy mi autorización para publicar este trabajo en el repositorio y acepto
+            las condiciones de uso y tratamiento de datos.
+          </label>
+        </div>
 
-  const body = construirBodyDesdeFormulario();
-  if (!body.autorizacionLegal) {
-    mensajeEl.textContent =
-      'Debes aceptar la autorización legal para guardar cambios.';
-    return;
-  }
+        <button type="submit">Enviar proyecto</button>
+        <p id="mensaje" style="margin-top: 8px; color: #155724;"></p>
+      </form>
+    </div>
 
-  try {
-    const res = await fetch(`${API_BASE}/proyectos/${proyectoEditandoId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    <!-- Sección de edición o borrado -->
+    <div class="card">
+      <h2>Gestiona tu proyecto publicado</h2>
+      <p>
+        Si tu proyecto ya ha sido aprobado y publicado, puedes editarlo para actualizar la información
+        o solicitar su eliminación del repositorio. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      </p>
 
-    if (!res.ok) {
-      mensajeEl.textContent = 'Error al guardar cambios en el proyecto.';
-      return;
-    }
+      <div style="margin-bottom: 16px;">
+        <button type="button" id="btnToggleEditar" class="btn-secundario">
+          Quiero editar los datos de mi proyecto
+        </button>
+        <button type="button" id="btnToggleBorrar" class="btn-secundario">
+          Quiero borrar mi proyecto del repositorio
+        </button>
+      </div>
 
-    mensajeEl.textContent = 'Proyecto actualizado correctamente.';
-  } catch (err) {
-    console.error(err);
-    mensajeEl.textContent = 'Error de conexión al actualizar.';
-  }
-});
+      <!-- Sección de EDICIÓN (oculta inicialmente) -->
+      <div id="seccionEditar" style="display: none; margin-top: 16px;">
+        <div style="background: #f0f0f0; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+          <label for="editTituloSearch">Nombre exacto de tu proyecto:</label><br />
+          <input type="text" id="editTituloSearch" placeholder="Escribe el título exactamente" />
+          <button type="button" id="btnCargarProyectoEditar">Buscar proyecto</button>
+          <p id="mensajeEditar" style="font-size: 0.9rem; margin-top: 4px;"></p>
+        </div>
 
-// ---------------------
-// ELIMINAR proyecto cargado directamente
-// (más adelante lo cambiaremos para que sea una solicitud de borrado)
-// ---------------------
-btnBorrarProyecto.addEventListener('click', async () => {
-  if (!proyectoEditandoId) {
-    alert('Primero carga un proyecto por título');
-    return;
-  }
+        <form id="formProyectoEditar" style="display: none;">
+          <div>
+            <label for="editTitulo">Título:</label><br />
+            <input type="text" id="editTitulo" name="titulo" />
+          </div>
 
-  if (!confirm('¿Seguro que quieres eliminar este proyecto?')) return;
+          <div>
+            <label for="editDescripcion">Descripción:</label><br />
+            <textarea id="editDescripcion" name="descripcion"></textarea>
+          </div>
 
-  try {
-    const res = await fetch(`${API_BASE}/proyectos/${proyectoEditandoId}`, {
-      method: 'DELETE',
-    });
+          <div>
+            <label for="editAsignatura">Asignatura:</label><br />
+            <input type="text" id="editAsignatura" name="asignatura" />
+          </div>
 
-    if (!res.ok) {
-      mensajeEl.textContent = 'Error al eliminar el proyecto.';
-      return;
-    }
+          <div>
+            <label for="editAutores">Autores (separados por comas):</label><br />
+            <input type="text" id="editAutores" name="autores" />
+          </div>
 
-    mensajeEl.textContent = 'Proyecto eliminado.';
-    form.reset();
-    proyectoEditandoId = null;
-  } catch (err) {
-    console.error(err);
-    mensajeEl.textContent = 'Error de conexión al eliminar.';
-  }
-});
+          <div>
+            <label for="editEnlaceExterno">Enlace externo:</label><br />
+            <input type="text" id="editEnlaceExterno" name="enlaceExterno" />
+          </div>
 
-// ---------------------
-// Función común: leer el formulario
-// ---------------------
-function construirBodyDesdeFormulario() {
-  const formData = new FormData(form);
+          <div>
+            <label for="editCurso">Curso:</label><br />
+            <input type="text" id="editCurso" name="curso" />
+          </div>
 
-  const titulo = formData.get('titulo').trim();
-  const descripcion = formData.get('descripcion').trim();
-  const asignatura = formData.get('asignatura').trim();
-  const autoresTexto = formData.get('autores').trim();
-  const enlaceExterno = formData.get('enlaceExterno').trim();
-  const curso = formData.get('curso').trim();
-  const anioTexto = formData.get('anio').trim();
-  const licencia = formData.get('licencia').trim();
-  const autorizacionLegal = formData.get('autorizacionLegal') === 'on';
+          <div>
+            <label for="editAnio">Año de creación:</label><br />
+            <input type="number" id="editAnio" name="anio" min="2000" max="2100" />
+          </div>
 
-  const autores = autoresTexto
-    ? autoresTexto
-        .split(',')
-        .map((a) => a.trim())
-        .filter(Boolean)
-    : [];
+          <div>
+            <label for="editLicencia">Licencia Creative Commons:</label><br />
+            <select id="editLicencia" name="licencia">
+              <option value="">Selecciona una licencia…</option>
+              <option value="CC BY">CC BY</option>
+              <option value="CC BY-SA">CC BY-SA</option>
+              <option value="CC BY-NC">CC BY-NC</option>
+              <option value="CC BY-NC-SA">CC BY-NC-SA</option>
+              <option value="CC0">CC0 (Dominio público)</option>
+            </select>
+          </div>
 
-  const body = {
-    titulo,
-    descripcion,
-    asignatura,
-    autores,
-    enlaceExterno,
-    imagenes: [],
-    videos: [],
-    curso,
-    anio: anioTexto ? Number(anioTexto) : undefined,
-    licencia,
-    autorizacionLegal,
-  };
+          <div>
+            <label>
+              <input type="checkbox" name="autorizacionLegal" />
+              Declaro que doy mi autorización para mantener este trabajo en el repositorio.
+            </label>
+          </div>
 
-  return body;
-}
+          <button type="button" id="btnGuardarCambios">Enviar solicitud de modificación</button>
+          <p id="mensajeGuardar" style="margin-top: 8px; color: #155724;"></p>
+        </form>
+      </div>
+
+      <!-- Sección de BORRADO (oculta inicialmente) -->
+      <div id="seccionBorrar" style="display: none; margin-top: 16px;">
+        <div style="background: #f0f0f0; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+          <label for="borrarTituloSearch">Nombre exacto de tu proyecto:</label><br />
+          <input type="text" id="borrarTituloSearch" placeholder="Escribe el título exactamente" />
+          <button type="button" id="btnCargarProyectoBorrar">Buscar proyecto</button>
+          <p id="mensajeBorrarBusqueda" style="font-size: 0.9rem; margin-top: 4px;"></p>
+        </div>
+
+        <div id="tarjetaProyectoBorrar" style="display: none; margin-bottom: 12px;">
+          <div class="card">
+            <h3 id="borrarTituloProyecto"></h3>
+            <p><strong>Asignatura:</strong> <span id="borrarAsignatura"></span></p>
+            <p><strong>Autores:</strong> <span id="borrarAutores"></span></p>
+            <p><strong>Descripción:</strong> <span id="borrarDescripcion"></span></p>
+          </div>
+
+          <button type="button" id="btnConfirmarBorrado">Quiero borrar mi proyecto</button>
+          <p id="mensajeBorrar" style="margin-top: 8px; color: #155724;"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <h3>Política de privacidad y tratamiento de datos</h3>
+    <p>
+      Aquí puedes incluir un resumen de la política de privacidad del repositorio y un enlace al
+      documento completo.
+    </p>
+  </footer>
+
+  <script src="subir.js"></script>
+</body>
+</html>
